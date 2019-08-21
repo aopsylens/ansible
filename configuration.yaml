@@ -1,0 +1,4 @@
+- name: Configure nodes to install kubeadm
+  hosts: all
+  roles:
+    - nodes

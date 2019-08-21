@@ -1,0 +1,5 @@
+- name: Create kubernetes clsuter
+  hosts: master
+  roles:
+    - master
+
