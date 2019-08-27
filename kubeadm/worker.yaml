@@ -1,0 +1,4 @@
+- name: Add worker to kubernetes cluster
+  hosts: worker
+  roles:
+    - worker

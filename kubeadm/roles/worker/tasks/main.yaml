@@ -1,0 +1,7 @@
+- name: Copy token to worker node
+  copy: src={{ HOME_DIR }}/{{ token }} dest={{ REMOTE_DIR }}/{{ token }}
+
+- name: Join worker node to kubernetes cluster
+  shell: |
+    cat {{ REMOTE_DIR }}/{{ token }} | tail -n2 > joinToken.sh
+    sh joinToken.sh

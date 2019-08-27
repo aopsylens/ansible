@@ -1,19 +1,24 @@
-- name: Installing kubeadm
+- name: Reset kubeadm
+  shell:
+    kubeadm reset -f
+
+- name: Install kubeadm
   yum: 
     name: kubectl
     state: latest
 
 - name: Initialization kubernetes cluster
-  shell: kubeadm init --apiserver-advertise-address={{  master.addr }} --pod-network-cidr=192.168.0.0/16
+  shell: kubeadm init --apiserver-advertise-address={{ master_addr }} --pod-network-cidr=192.168.0.0/16
   register: output
 
 - name: Storing logs and generated token for future
+  local_action: copy content={{ output.stdout }} dest={{ HOME_DIR }}/token_kubeadm
 
-  - name: Copying required files
-    shell: |
-     mkdir -p $HOME/.kube
-     sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
-     sudo chown $(id -u):$(id -g) $HOME/.kube/config
+- name: Copy required files
+  shell: |
+    mkdir -p $HOME/.kube
+    sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 - name: Install calico pod
   shell: "kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml"
