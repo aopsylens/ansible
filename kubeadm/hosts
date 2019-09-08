@@ -1,9 +1,0 @@
-[master]
-master ansible_host=89.22.185.16 ansible_port=2032
-
-[worker]
-worker ansible_host=89.22.185.16 ansible_port=2033
-
-[nodes:children]
-master
-worker
