@@ -1,3 +1,7 @@
+- name: Reset kubeadm
+  shell:
+    kubeadm reset -f
+
 - name: Copy token to worker node
   copy: src={{ HOME_DIR }}/{{ token }} dest={{ REMOTE_DIR }}/{{ token }}
 
