@@ -12,7 +12,7 @@
   register: output
 
 - name: Storing logs and generated token for future
-  local_action: copy content={{ output.stdout }} dest={{ HOME_DIR }}/token_kubeadm
+  local_action: copy content={{ output.stdout }} dest={{ HOME_DIR }}/{{ token }}
 
 - name: Copy required files
   shell: |

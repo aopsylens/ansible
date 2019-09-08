@@ -1,8 +1,8 @@
 [master]
-192.168.42.10	ansible_user=root
+master ansible_host=89.22.185.16 ansible_port=2032
 
 [worker]
-192.168.42.11	ansible_user=root
+worker ansible_host=89.22.185.16 ansible_port=2033
 
 [nodes:children]
 master

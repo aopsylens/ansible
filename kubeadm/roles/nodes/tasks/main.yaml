@@ -53,3 +53,6 @@
 
 - name: Enabling pass bridged IPv4 traffic
   shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"
+
+- name: Reboot virtual machine
+  reboot:

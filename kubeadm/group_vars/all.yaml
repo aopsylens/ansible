@@ -1,4 +1,4 @@
-master_addr: 192.168.42.10
-HOME_DIR: /home/evsq
+master_addr: 10.30.0.2
+HOME_DIR: /root
 REMOTE_DIR: /root
 token: tokenKubeadm
