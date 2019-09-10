@@ -1,7 +1,0 @@
-- name: Create kubernetes cluster
-  hosts: all
-  roles:
-    - nodes
-    - master
-    - worker
-
