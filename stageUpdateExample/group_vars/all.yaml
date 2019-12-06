@@ -1,0 +1,3 @@
+FILES_DIR : /tmp/
+REMOTE_DIR: /home/someuser/
+backend_binary: backend

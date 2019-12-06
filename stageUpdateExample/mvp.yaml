@@ -1,0 +1,4 @@
+- name: Update mvp binary on stage
+  hosts: stage
+  roles:
+    - mvp

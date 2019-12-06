@@ -1,0 +1,2 @@
+[stage]
+stage ansible_host=1.2.3.4 ansible_port=1111 ansible_user=someuser

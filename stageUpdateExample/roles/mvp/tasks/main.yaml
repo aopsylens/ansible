@@ -1,0 +1,30 @@
+- name: Pull new changes from gitlab
+  shell: |
+    cd somedir
+    git pull
+    go build -o {{ backend_binary }} cmd/*.go
+    mv {{ backend_binary }} /tmp/
+  delegate_to: localhost
+
+- name: Copy new mvp binary to mvp node
+  copy: src={{ FILES_DIR }}/{{ backend_binary }} dest={{ REMOTE_DIR }}/{{ backend_binary }}
+
+- name: Preserve last bin
+  shell: |
+    cd /usr/local/bin
+    rm -rf {{ backend_binary }}.old
+    mv {{ backend_binary }} {{ backend_binary }}.old
+  become: yes
+
+- name: Change owner, permissions and move to bin dir
+  shell: |
+    chown root. {{ backend_binary }}
+    chmod 755 {{ backend_binary }}
+    mv {{ backend_binary }} /usr/local/bin
+  become: yes
+
+- name: Restart service
+  systemd:
+    name: someservice
+    state: restarted
+  become: yes
