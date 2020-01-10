@@ -1,0 +1,43 @@
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install required packages
+  yum:
+    name:
+      - gcc
+      - openssl-devel
+      - bzip2-devel
+      - wget
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2 
+      - epel-release
+    state: latest
+
+- name: Install pip
+  yum:
+    name: python-pip
+    state: latest
+
+- name: Install pyopenssl
+  pip:
+    name: pyopenssl
+
+- name: Download docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+- name: Install docker
+  yum:
+    name: docker-ce
+    state: latest
+
+- name: Download docker compose
+  get_url: 
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755
+

@@ -1,0 +1,14 @@
+- name: Download and extract files from an archive
+  unarchive:
+    src: https://github.com/goharbor/harbor/releases/download/v1.9.4/harbor-online-installer-v1.9.4.tgz
+    dest: /etc/
+    remote_src: yes
+
+- name: Create a directory for certs
+  file:
+    path: /etc/harbor/openssl
+    state: directory
+
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: /etc/harbor/openssl/{{ ansible_nodename }}.key
