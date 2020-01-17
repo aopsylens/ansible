@@ -1,0 +1,50 @@
+- name: Download and extract files from an archive
+  unarchive:
+    src: https://github.com/goharbor/harbor/releases/download/v1.9.4/harbor-online-installer-v1.9.4.tgz
+    dest: /etc/
+    remote_src: yes
+
+- name: Create a directory for certs
+  file:
+    path: /etc/harbor/openssl
+    state: directory
+
+- name: Generate an OpenSSL ca key
+  shell: |
+    openssl genrsa -out ca.key 4096
+
+- name: Generate an OpenSSL CA cert
+  shell: |
+    openssl req -x509 -new -nodes -sha512 -days 3650 \
+    -subj "/C=RU/ST=Russia/L=Moscow/O=test/OU=test/CN={{ ansible_nodename }}" \
+    -key ca.key \
+    -out ca.crt
+
+- name: Generate an OpenSSL private key
+  shell: |
+    openssl genrsa -out {{ ansible_nodename }}.key 4096
+
+- name: Generate an OpenSSL csr key
+  shell: |
+    openssl req -sha512 -new \
+    -subj "/C=RU/ST=Russia/L=Moscow/O=test/OU=test/CN={{ ansible_nodename }}" \
+    -key {{ ansible_nodename }}.key \
+    -out {{ ansible_nodename }}.csr
+
+- name: Adding openssl configuration file
+  template: 
+    src=v3.ext.j2
+    dest=/etc/harbor/openssl/v3.ext
+
+- name: Generate an OpenSSL cert
+  shell: |
+    openssl x509 -req -sha512 -days 3650 \
+    -extfile /etc/harbor/openssl/v3.ext \
+    -CA ca.crt -CAkey ca.key -CAcreateserial \
+    -in {{ ansible_nodename }}.csr \
+    -out {{ ansible_nodename }}.crt
+
+- name: Create a directory into Docker directory to get around X509 unauthorized cert error
+  file:
+    path: /etc/docker/certs.d/{{ ansible_nodename }}/
+    state: directory
