@@ -2,4 +2,4 @@
   hosts: harbor
   roles:
     - configuration
-    - certs
+    - harbor
