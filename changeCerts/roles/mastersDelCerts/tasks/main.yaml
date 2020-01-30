@@ -1,0 +1,22 @@
+- name: stop and disable kube services on worker node
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - etcd
+    - kubernetes.target
+    - kube-apiserver
+    - kube-scheduler
+    - kube-controller-manager
+
+- name: delete all certs and configs
+  shell: |
+    rm -rf /etc/kubernetes/*
+    rm -rf /etc/ssl/etcd/*
+    mkdir /etc/kubernetes/pki
+    rm -rf {{ inventory_hostname }}
+    rm -rf master
+
+- name: Reboot virtual machine
+  reboot:

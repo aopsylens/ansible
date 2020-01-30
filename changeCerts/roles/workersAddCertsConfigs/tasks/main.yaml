@@ -1,0 +1,33 @@
+- name: Add kube-proxy.yaml
+  template: src=kube-proxy.yaml.j2
+            dest=/etc/kubernetes/kube-proxy.yaml
+  
+- name: Add kubelet.yaml
+  template: src=kubelet.yaml.j2
+            dest=/etc/kubernetes/kubelet.yaml
+
+- name: Copy dir with certs and configs to node
+  copy:
+    src={{ CERTS_DIR }}/{{ inventory_hostname }}
+    dest={{ DEST_CERTS_DIR }}
+
+- name: copy all certs and configs into kube dir
+  shell: |
+    cd {{ inventory_hostname }}
+    chmod 600 *.key
+    chmod 600 *.kubeconfig
+    mv *.{crt,key} /etc/kubernetes/pki/
+    mv *.kubeconfig /etc/kubernetes/
+
+- name: start kube services on worker node
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - kubernetes.target
+    - crio
+    - kubelet
+    - kube-proxy
+
+

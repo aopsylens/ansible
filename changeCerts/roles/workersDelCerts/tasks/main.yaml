@@ -1,0 +1,19 @@
+- name: stop and disable kube services on worker node
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - kubernetes.target
+    - crio
+    - kubelet
+    - kube-proxy
+
+- name: delete all certs and configs
+  shell: |
+    rm -rf /etc/kubernetes/*
+    mkdir /etc/kubernetes/pki
+    rm -rf {{ inventory_hostname }}
+
+- name: Reboot virtual machine
+  reboot:

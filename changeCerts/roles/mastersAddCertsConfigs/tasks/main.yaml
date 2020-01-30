@@ -1,0 +1,32 @@
+- name: Add kube-scheduler.yaml
+  template: src=kube-scheduler.yaml.j2
+            dest=/etc/kubernetes/kube-scheduler.yaml
+
+- name: Copy dir with certs and configs to node
+  copy:
+    src={{ CERTS_DIR }}/{{ inventory_hostname }}
+    dest={{ DEST_CERTS_DIR }}
+
+- name: Copy dir with certs and configs to node
+  copy:
+    src={{ CERTS_DIR }}/master
+    dest={{ DEST_CERTS_DIR }}
+
+
+- name: copy certs into etcd dir
+  shell: |
+    cd {{ inventory_hostname }}
+    chmod 640 *.key
+    mv * /etc/ssl/etcd/
+    chown etcd. /etc/ssl/etcd/*
+
+- name: copy all certs and configs into kube dir
+  shell: |
+    cd master
+    chmod 600 *.key
+    chmod 600 *.kubeconfig
+    mv *.{crt,key} /etc/kubernetes/pki/
+    mv *.kubeconfig /etc/kubernetes/
+
+
+

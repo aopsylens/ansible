@@ -1,0 +1,5 @@
+- name: Certs configuration on masters
+  hosts: masters
+  roles:
+    - mastersAddCertsConfigs
+    #- mastersDelCerts

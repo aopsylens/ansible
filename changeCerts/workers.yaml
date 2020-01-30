@@ -1,0 +1,5 @@
+- name: Certs configuration on workers
+  hosts: workers
+  roles:
+    - workersAddCertsConfigs
+    #- workersDelCerts
