@@ -1,0 +1,7 @@
+job_name: "client-monitor-m1"
+s3_bucket: "s3://bucket"
+s3_archive: "a0d3552d.zip"
+targets: "1.2.3.4:9100"
+cert_dir: "/tmp/s3certs"
+cert_name: "client"
+prometheus_cert_dir: "/etc/prometheus/certs"

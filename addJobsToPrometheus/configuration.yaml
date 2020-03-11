@@ -1,0 +1,6 @@
+- name: Add new job to prometheus config
+  hosts: monitoring
+  roles:
+    - addJob
+    - addHttpsJob
+    

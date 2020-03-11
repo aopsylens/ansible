@@ -1,0 +1,71 @@
+- name: Download certs archive
+  command: s3cmd get {{s3_bucket}}/{{ s3_archive }}
+  delegate_to: localhost
+
+- name: Create temporary directory
+  file:
+    path: "{{ cert_dir }}"
+    state: directory
+  delegate_to: localhost
+
+- name: Unzip certs archive
+  unarchive: 
+    src: "{{ s3_archive }}" 
+    dest: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Remove s3 archive
+  file:
+    path: "{{ s3_archive }}"
+    state: absent
+  delegate_to: localhost
+
+- name: Save directory name
+  find:
+    paths: "{{ cert_dir }}"
+    file_type: directory
+  delegate_to: localhost
+
+- name: Generate certs for monitoring etcd
+  shell: |
+    mv {{ cert_dir }}/$(ls {{ cert_dir }}) {{ cert_dir }}/{{ cert_name }}
+    cd {{ cert_dir }}/{{ cert_name }}
+    cert-machine gen-cert etcd-user {{ cert_name }}
+  delegate_to: localhost
+
+- name: Create directory for certs
+  file:
+    path: /etc/prometheus/certs/{{ cert_name }}
+    state: directory
+  become: yes
+
+- name: Copy certs to prometheus
+  copy: src={{ cert_dir }}/{{ cert_name }}/certs/etcd-users/{{ item }} dest={{ prometheus_cert_dir }}/{{ cert_name }}
+  with_items:
+    - etcd-ca.crt
+    - "{{ cert_name }}.crt"
+    - "{{ cert_name }}.key"
+  become: yes
+
+- name: Add new job in prometheus config
+  blockinfile:
+    path: /etc/prometheus/prometheus.yml
+    insertbefore: rule_files
+    marker: "# {mark} monitor etcd {{ cert_name }}"
+    block: |2
+        - job_name: '{{ job_name }}'
+          scheme: https
+          tls_config:
+            ca_file: {{ prometheus_cert_dir }}/etcd-ca.crt
+            cert_file: {{ prometheus_cert_dir }}/{{ cert_name }}.crt
+            key_file: {{ prometheus_cert_dir }}/{{ cert_name }}.key
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['{{ targets }}']
+  become: yes
+
+- name: Restart prometheus
+  systemd:
+    name: prometheus
+    state: restarted
+  become: yes

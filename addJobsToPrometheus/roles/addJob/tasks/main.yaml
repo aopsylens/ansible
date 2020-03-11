@@ -1,0 +1,17 @@
+- name: Add new job in prometheus config
+  blockinfile:
+    path: /etc/prometheus/prometheus.yml
+    marker: "# {mark} monitor master {{ cert_name }}"
+    insertbefore: rule_files
+    block: |2
+        - job_name: '{{ job_name }}'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['{{ targets }}']
+  become: yes
+
+- name: Restart prometheus
+  systemd:
+    name: prometheus
+    state: restarted
+  become: yes
