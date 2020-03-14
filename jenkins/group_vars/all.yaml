@@ -1,0 +1,12 @@
+jenkins_package_state: latest
+jenkins_hostname: jenkins.example.com
+jenkins_admin_username: admin
+jenkins_admin_password: admin
+jenkins_plugins: [
+ 
+  'workflow-aggregator', 
+  'gitlab-plugin', 
+  'git'
+  ]
+java_packages:
+  - java-1.8.0-openjdk-devel
