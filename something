@@ -6,4 +6,13 @@ cat <<EOF > nginx.yaml
   roles:
     - role: nginxinc.nginx
   become: yes
-  EOF
+EOF
+
+# install node exporter
+ansible-galaxy install cloudalchemy.node-exporter
+
+cat <<EOf > nexporter.yaml
+- hosts: nexporter
+  roles:
+    - cloudalchemy.node-exporter
+EOF
