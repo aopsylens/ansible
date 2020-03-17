@@ -1,0 +1,9 @@
+# install nginx
+ansible-galaxy install nginxinc.nginx
+
+cat <<EOF > nginx.yaml
+- hosts: nginx
+  roles:
+    - role: nginxinc.nginx
+  become: yes
+  EOF
