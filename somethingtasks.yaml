@@ -1,4 +1,4 @@
-- name: Add Jenkins User
+- name: Add User
   user:
     name: user
     groups: wheel
@@ -26,3 +26,18 @@
     owner: user
     group: user
     mode: 0600
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+    
+- name: Disable SELinux
+  selinux:
+    state: disabled
+    
+- name: Disable firewalld
+  systemd:
+    name: firewalld
+    enabled: no
+    masked: yes
