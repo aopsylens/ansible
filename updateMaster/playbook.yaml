@@ -37,9 +37,9 @@
         path: "/etc/sysconfig/network-scripts/route-ens224"
       register: file
 
-    - name: Ensure /etc/hosts contains 1.2.3.0/24 via 1.2.255.1 dev ens224
+    - name: Ensure /etc/sysconfig/network-scripts/route-ens224 contains 1.2.3.0/24 via 1.2.255.1 dev ens224
       lineinfile:
-        path: /etc/hosts
+        path: /etc/sysconfig/network-scripts/route-ens224
         regexp: '^1.2.3.0/24 via 1.2.255.1 dev ens224'
         state: absent
       check_mode: yes
