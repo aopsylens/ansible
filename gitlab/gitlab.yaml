@@ -1,0 +1,14 @@
+- name: Install Roles from Galaxy
+  hosts: all
+  tasks:
+    - name: installing required ansible-galaxy roles
+      command: "ansible-galaxy install --ignore-errors -r requirements.yaml"
+      delegate_to: localhost
+
+- name: Deploy Gitlab
+  hosts: jenkins
+  become: yes
+
+  roles:
+    - geerlingguy.gitlab
+

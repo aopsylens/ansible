@@ -1,0 +1,67 @@
+- hosts: all
+  become: yes
+  handlers:
+    - name: Restart network
+      systemd:
+        name: network
+        state: restarted
+    - name: Restart ccm
+      systemd:
+        name: cloud-controller-manager
+        state: restarted
+
+  tasks:
+    - name: Install libselinux
+      yum:
+        name: libselinux-python 
+        state: latest
+
+    - name: Ensure /etc/hosts contains 1.2.3.4    somedomain
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^1.2.3.4    somedomain'
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: out
+
+    - name: Update /etc/hosts
+      blockinfile:
+        path: /etc/hosts
+        block: |
+          1.2.3.4    somedomain
+      when: not out.found
+
+    - name: Ensure /etc/sysconfig/network-scripts/route-ens224 exists
+      stat:
+        path: "/etc/sysconfig/network-scripts/route-ens224"
+      register: file
+
+    - name: Ensure /etc/hosts contains 1.2.3.0/24 via 1.2.255.1 dev ens224
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^1.2.3.0/24 via 1.2.255.1 dev ens224'
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: out
+
+    - name: Configure static route
+      copy:
+        src: route-ens224
+        dest: /etc/sysconfig/network-scripts/route-ens224
+        owner: root
+        group: root
+        mode: '0644'
+      when: file.stat.exists == False and not out.found
+      notify: Restart network
+
+    - name: Copy vsphere.conf
+      copy:
+        src: vsphere.conf
+        dest: /etc/cloud/vsphere.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart ccm
+      
