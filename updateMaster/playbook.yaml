@@ -32,10 +32,16 @@
           1.2.3.4    somedomain
       when: not out.found
 
-    - name: Ensure /etc/sysconfig/network-scripts/route-ens224 exists
+       - name: Ensure /etc/sysconfig/network-scripts/route-ens224 exists
       stat:
-        path: "/etc/sysconfig/network-scripts/route-ens224"
+        path: /etc/sysconfig/network-scripts/route-ens224
       register: file
+
+    - name: Create a file to avoid further errors
+      file:
+        path: /etc/sysconfig/network-scripts/route-ens224
+        state: touch
+      when: file.stat.exists == False
 
     - name: Ensure /etc/sysconfig/network-scripts/route-ens224 contains 1.2.3.0/24 via 1.2.255.1 dev ens224
       lineinfile:
@@ -53,7 +59,7 @@
         owner: root
         group: root
         mode: '0644'
-      when: file.stat.exists == False and not out.found
+      when: not out.found
       notify: Restart network
 
     - name: Copy vsphere.conf
