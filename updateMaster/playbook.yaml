@@ -32,7 +32,7 @@
           1.2.3.4    somedomain
       when: not out.found
 
-       - name: Ensure /etc/sysconfig/network-scripts/route-ens224 exists
+    - name: Ensure /etc/sysconfig/network-scripts/route-ens224 exists
       stat:
         path: /etc/sysconfig/network-scripts/route-ens224
       register: file
