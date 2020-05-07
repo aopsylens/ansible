@@ -1,0 +1,87 @@
+---
+- hosts: node-exporter
+  become: true
+  roles:
+  - cloudalchemy.node-exporter
+  vars:
+    node_exporter_web_listen_address: "0.0.0.0:9100"
+
+- hosts: monitoring
+  become: true
+  roles:
+  - cloudalchemy.prometheus
+  - cloudalchemy.alertmanager
+  - cloudalchemy.blackbox-exporter
+  - cloudalchemy.grafana
+  vars:
+# prometheus
+    prometheus_web_listen_address: "0.0.0.0:9090"
+    prometheus_scrape_configs:
+    - job_name: 'node-exporters'
+      scrape_interval: 5s
+      static_configs:
+        - targets: ['zone-msk1-a:9100', 'zone-msk1-b:9100', 'zone-msk1-c:9100']
+    - job_name: platform
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      static_configs:
+      - targets:
+        - http://zone-msk1-a:8090
+        - http://zone-msk1-b:8090
+        - http://zone-msk1-c:8090
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+    prometheus_alertmanager_config:
+    - static_configs:
+      - targets:
+        - 127.0.0.1:9093
+    prometheus_alert_rules:
+    - alert: Instance down
+      expr: "up == 0"
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.{% endraw %}"
+        summary: "{% raw %}Instance {{ $labels.instance }} down{% endraw %}"
+    - alert: ProbeFailing
+      expr: "probe_success == 0"
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "{% raw %}{{ $labels.instance }} of {{ $labels.job }} unavailable for more than 1 minute.{% endraw %}"
+        summary: "{% raw %}Zone {{ $labels.instance }} unavailable{% endraw %}"
+# alertmanager
+    alertmanager_config_file: 'alertmanager/templates/alertmanager.yml.j2'
+    alertmanager_web_listen_address: "0.0.0.0:9093"
+# blackbox-exporter
+    blackbox_exporter_web_listen_address: "0.0.0.0:9115"
+# grafana
+    grafana_security:
+      admin_user: admin
+      admin_password: CObAYYidgIEwBbadj
+    grafana_datasources:
+    - name: prometheus
+      type: prometheus
+      url: 'http://0.0.0.0:9090'
+      basicAuth: false
+    - name: alertmanager
+      type: alertmanager
+      url: 'http://0.0.0.0:9093'
+      basicAuth: false
+    grafana_dashboards:
+    - dashboard_id: 1860
+      revision_id: 18
+      datasource: prometheus
+    - dashboard_id: 8010
+      revision_id: 1
+      datasource: alertmanager
+
+

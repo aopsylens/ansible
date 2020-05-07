@@ -1,0 +1,9 @@
+- src: cloudalchemy.prometheus
+
+- src: cloudalchemy.alertmanager
+
+- src: cloudalchemy.blackbox-exporter
+
+- src: cloudalchemy.grafana
+
+- src: cloudalchemy.node-exporter

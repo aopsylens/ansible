@@ -1,0 +1,7 @@
+[monitoring]
+monitoring ansible_host=1.2.3.4 ansible_port=2200 ansible_user=someuser
+
+[node-exporter]
+node-exporter1 ansible_host=1.2.3.4 ansible_port=2002 ansible_user=someuser
+node-exporter2 ansible_host=1.2.3.4 ansible_port=2003 ansible_user=someuser
+node-exporter3 ansible_host=1.2.3.4 ansible_port=2004 ansible_user=someuser
