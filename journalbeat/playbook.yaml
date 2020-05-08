@@ -3,6 +3,16 @@
   vars:
     elastic-kibana-ip: '1.2.3.4'
   tasks:
+  - name: Download journalbeat
+    get_url:
+      url: https://artifacts.elastic.co/downloads/beats/journalbeat/journalbeat-7.4.2-x86_64.rpm
+      dest: /tmp/journalbeat-7.4.2-x86_64.rpm
+      
+  - name: Install journalbeat
+    yum:
+      name: /tmp/journalbeat-7.4.2-x86_64.rpm
+      state: present
+
   - name: Add journalbeat.yml
     template:
       src: journalbeat.yml.j2
