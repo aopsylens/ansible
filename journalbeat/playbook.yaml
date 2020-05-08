@@ -1,0 +1,26 @@
+- hosts: journalbeat
+  become: true
+  vars:
+    elastic-kibana-ip: '1.2.3.4'
+  tasks:
+  - name: Add journalbeat.yml
+    template:
+      src: journalbeat.yml.j2
+      dest: /etc/journalbeat/journalbeat.yml
+      owner: root
+      group: root
+      mode: '0600'
+
+  - name: Restart systemd-journal
+    systemd:
+      name: systemd-journald
+      state: restarted
+
+  - name: Start journalbeat
+    systemd:
+      name: journalbeat
+      state: started
+      enabled: yes
+
+  - name: Setup journalbeat
+    command: journalbeat setup
