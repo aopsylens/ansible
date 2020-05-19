@@ -9,13 +9,14 @@
     git_dir: "somedir"
     backend_binary: "somebin"
     dest_dir: "/usr/local/bin"
+    branch: "develop"
 
   tasks:
   - name: Pull new changes from git
     git:
       repo: "{{ git_url }}"
       dest: "{{ git_dir }}"
-      version: develop
+      version: "{{ branch }}"
       clone: yes
       recursive: yes
       force: yes
