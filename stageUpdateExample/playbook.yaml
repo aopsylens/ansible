@@ -1,0 +1,46 @@
+- hosts: all
+  handlers:
+    - name: Restart service
+      systemd:
+        name: "{{ backend_binary }}"
+        state: restarted
+  vars:
+    git_url: "git@somegit.git"
+    git_dir: "somedir"
+    backend_binary: "somebin"
+    dest_dir: "/usr/local/bin"
+
+  tasks:
+  - name: Pull new changes from git
+    git:
+      repo: "{{ git_url }}"
+      dest: "{{ git_dir }}"
+      version: develop
+      clone: yes
+      recursive: yes
+      force: yes
+      accept_hostkey: yes
+    run_once: true
+    delegate_to: localhost
+
+  - name: Build go binary
+    shell: cd {{ git_dir }} && go build -o {{ backend_binary }}
+    run_once: true
+    delegate_to: localhost
+  
+  - name: Preserve current binary
+    copy: 
+      remote_src: True 
+      src: "{{ dest_dir }}/{{ backend_binary }}"
+      dest: "{{ dest_dir }}/{{ backend_binary }}.old"
+    become: yes
+  
+  - name: Copy file with owner and permissions
+    copy:
+      src: "{{ git_dir }}/{{ backend_binary }}"
+      dest: "{{ dest_dir }}/{{ backend_binary }}"
+      owner: root
+      group: root
+      mode: '0755'
+    become: yes
+    notify: Restart service
