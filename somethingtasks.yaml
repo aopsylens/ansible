@@ -49,4 +49,16 @@
     with_items:
       - /etc/systemd/system/blackbox_exporter.service
       - /etc/blackbox_exporter.yml
-      - /usr/local/bin/blackbox_exporter
+      - /usr/local/bin/blackbox_exporter  
+      
+     - name: Ensure {{ dir_name }} exists
+      stat:
+        path: "{{ dir_name }}"
+      register: directory
+
+    - name: Create a directory to avoid further errors
+      file:
+        path: "{{ dir_name }}"
+        state: directory
+        recurse: yes
+      when: directory.stat.exists == False     
