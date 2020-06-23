@@ -1,8 +1,20 @@
-- name: Add User
-  user:
-    name: user
-    groups: wheel
-    append: yes
+  - name: Create group
+    group:
+      name: user
+      state: present
+      gid: 1020
+
+  - name: Create user
+    user:
+      name: user
+      password: "{{ 'strongpass' | password_hash('sha512') }}"
+      uid: 1020
+      group: user
+      groups: wheel
+      shell: /bin/bash
+      create_home: yes
+      append: yes
+      update_password: on_create
 
 - name: Allow 'wheel' group to have passwordless sudo
   lineinfile:
