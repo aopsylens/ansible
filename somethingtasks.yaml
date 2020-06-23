@@ -31,6 +31,12 @@
     owner: user
     group: user
 
+  - name: Set authorized key taken from file
+    authorized_key:
+      user: user
+      state: present
+      key: "{{ lookup('file', 'id_rsa.pub') }}"
+
 - name: Add pub key
   copy:
     src: somekey.pub
