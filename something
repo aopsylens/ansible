@@ -19,3 +19,6 @@ ansible-galaxy install geerlingguy.docker
   vars:
     docker_edition: 'ce'
     docker_install_compose: true
+
+# disable prompt ssh message
+host_key_checking = False in the /etc/ansible/ansible.cfg file, or by setting the environment variable, ANSIBLE_HOST_KEY_CHECKING=False.
